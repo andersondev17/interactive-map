@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",
+    "@nuxtjs/dotenv": "^1.4.2",
     "@tanstack/vue-table": "^8.21.2",
     "@vueuse/core": "^12.8.2",
     "class-variance-authority": "^0.7.1",
