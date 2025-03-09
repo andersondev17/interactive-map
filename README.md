@@ -46,8 +46,8 @@ Crear un archivo .env en la raíz:
 ```bash
 
 GOOGLE_MAPS_API_KEY="tu-clave-de-google-maps"
-API_KEY="PMAK-67cc70912223a600012dd70b-30de87801d270d0ffec81b2eeb9d5d153f"
-API_URL="https://95dce2ee-6dd7-4497-9763-008567e0efaf.mock.pstmn.io"
+API_KEY=
+API_URL=
 ``
 
 4 . Abrir en el navegador:
