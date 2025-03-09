@@ -1,75 +1,76 @@
-# Nuxt Minimal Starter
+# Mapa Interactivo con Nuxt 3, Vue 3 y Google Maps
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+![Captura del Mapa](docs/screenshot.png) <!-- Añadir imagen del mapa -->
 
-## Setup
+Aplicación web para visualizar proyectos solares en un mapa interactivo, con heatmaps de precios y radiación, búsqueda por coordenadas, y estadísticas
 
-Make sure to install dependencies:
+## Características Principales
+- 🗺️ Mapa interactivo con Google Maps.
+- 🔥 Heatmaps personalizados para precios (azul) y radiación solar (verde-rojo).
+- 📍 Búsqueda por coordenadas con validación.
+- 📏 Control deslizante para ajustar el radio de búsqueda (1-50 km).
+- 📊 Estadísticas detalladas de proyectos cercanos.
+- 🛠️ Integración con API externa y datos de muestra.
+
+## Tecnologías
+- **Frontend:** Nuxt 3, Vue 3 (Composition API)
+- **Mapas:** Google Maps API (`@googlemaps/js-api-loader`)
+- **UI:** ShadCN/Radix (Componentes: Card, Slider, Switch)
+- **Herramientas:** TypeScript
+
+## Configuración Inicial
+
+### Requisitos
+- Node.js v18+
+- Clave API de Google Maps ([Aquí](https://developers.google.com/maps/documentation/javascript/get-api-key))
+
+### Pasos para Ejecutar
+1. Clonar el repositorio:
+```bash
+   git clone https://github.com/tu-usuario/mapa-interactivo.git
+   cd mapa-interactivo
+
+   ```
+
+2.   Instalar dependencias:
 
 ```bash
-# npm
+
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
 
-Start the development server on `http://localhost:3000`:
+3. Configurar variables de entorno:
+Crear un archivo .env en la raíz:
 
 ```bash
-# npm
+
+GOOGLE_MAPS_API_KEY="tu-clave-de-google-maps"
+API_KEY="PMAK-67cc70912223a600012dd70b-30de87801d270d0ffec81b2eeb9d5d153f"
+API_URL="https://95dce2ee-6dd7-4497-9763-008567e0efaf.mock.pstmn.io"
+``
+
+4 . Abrir en el navegador:
+
 npm run dev
 
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+## Uso
+### Búsqueda por Coordenadas
 
-Build the application for production:
+- Ingresa latitud y longitud (ej: 6.2442, -75.5812 para Medellín).
 
-```bash
-# npm
-npm run build
+- Haz clic en "Buscar" para centrar el mapa.
 
-# pnpm
-pnpm build
+- Ajustar Radio de Búsqueda
 
-# yarn
-yarn build
+- Utiliza el slider en el panel derecho para definir el radio (1-50 km).
 
-# bun
-bun run build
-```
+- Alternar Heatmaps
 
-Locally preview production build:
+- Usa los switches en el panel superior derecho para activar/desactivar heatmaps de precios o radiación.
 
-```bash
-# npm
-npm run preview
+- Ver Proyectos Cercanos
 
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- Los proyectos dentro del radio aparecen en el panel izquierdo con estadísticas detalladas.
