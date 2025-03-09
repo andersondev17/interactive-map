@@ -46,8 +46,8 @@ Crear un archivo .env en la raíz:
 ```bash
 
 GOOGLE_MAPS_API_KEY="tu-clave-de-google-maps"
-API_KEY=
-API_URL=
+API_KEY="tu-clave-api-aquí"
+API_URL="tu-clave-url"
 ``
 
 4 . Abrir en el navegador:
