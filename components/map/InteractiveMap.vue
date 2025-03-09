@@ -94,7 +94,7 @@ onMounted(async () => {
     />
     <ProjectStatistics :stats="statistics" />
     
-    <!-- Lista de proyectos cercanos (cuando hay un punto de búsqueda) -->
+    <!-- Lista de proyectos cercanosd (cuando hay un punto de búsqueda) -->
     <NearbyProjects 
       v-if="searchPoint" 
       :projects="projects" 
