@@ -8,7 +8,6 @@ export default function useHeatmap(
 ) {
     const heatmap = ref<google.maps.visualization.HeatmapLayer | null>(null);
     const activeHeatmapType = ref<'price' | 'radiation' | null>(null);
-    const isLoading = ref(false);
 
     // Función para alternar heatmaps
     const toggleHeatmap = (type: 'price' | 'radiation') => {
@@ -28,20 +27,34 @@ export default function useHeatmap(
     const generateHeatmapData = (type: 'price' | 'radiation'): HeatmapData[] => {
         if (!projects.value.length) return [];
         
-        const values = projects.value.map(p => p[type]);
+        // Filtrar proyectos con ubicación válida
+        const validProjects = projects.value.filter(p => p.location);
+        
+        if (!validProjects.length) return [];
+        
+        // Obtener valores según el tipo
+        const values = validProjects.map(p => 
+            type === 'radiation' ? (p.radiation || 0) : p.price
+        );
+        
         const maxValue = Math.max(...values);
         const minValue = Math.min(...values);
         const range = maxValue - minValue;
         
-        return projects.value.map(project => ({
-            location: project.location,
-            weight: range ? (project[type] - minValue) / range : 0.5 // Normalizar entre 0-1
+        if (range === 0) return validProjects.map(p => ({
+            location: p.location!,
+            weight: 0.5
+        }));
+        
+        return validProjects.map((project, i) => ({
+            location: project.location!,
+            weight: (values[i] - minValue) / range
         }));
     };
 
     // Función para crear el heatmap
     const createHeatmap = (data: HeatmapData[]) => {
-        if (!map.value) return;
+        if (!map.value || !data.length) return;
 
         const weightedLocations = data.map(d => ({
             location: new google.maps.LatLng(d.location.lat, d.location.lng),
@@ -50,7 +63,7 @@ export default function useHeatmap(
 
         heatmap.value?.setMap(null); // Limpiar anterior
         
-        // Configuración específica según el tipo de heatmap
+        // Gradientes para cada tipo
         const gradients = {
             price: [
                 'rgba(0, 255, 255, 0)',
@@ -58,11 +71,7 @@ export default function useHeatmap(
                 'rgba(0, 191, 255, 1)',
                 'rgba(0, 127, 255, 1)',
                 'rgba(0, 63, 255, 1)',
-                'rgba(0, 0, 255, 1)',
-                'rgba(0, 0, 223, 1)',
-                'rgba(0, 0, 191, 1)',
-                'rgba(0, 0, 159, 1)',
-                'rgba(0, 0, 127, 1)'
+                'rgba(0, 0, 255, 1)'
             ],
             radiation: [
                 'rgba(0, 255, 0, 0)',
@@ -85,17 +94,16 @@ export default function useHeatmap(
         });
     };
 
-    watch(projects, (newProjects) => {
-        if (activeHeatmapType.value && newProjects.length > 0) {
-            const heatmapData = generateHeatmapData(activeHeatmapType.value);
-            createHeatmap(heatmapData);
+    // Actualizar cuando cambien los proyectos
+    watch(projects, () => {
+        if (activeHeatmapType.value) {
+            const data = generateHeatmapData(activeHeatmapType.value);
+            createHeatmap(data);
         }
-    }, { deep: true });
+    });
     
     return { 
-        createHeatmap,
         toggleHeatmap,
-        activeHeatmapType: activeHeatmapType.value, // Exportar el valor actual
-        isLoading: isLoading.value  // Exportar el valor actual
+        activeHeatmapType: computed(() => activeHeatmapType.value)
     };
 }

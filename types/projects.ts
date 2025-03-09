@@ -1,27 +1,29 @@
-// types/projects.ts
+import type { Coordinates } from "./map";
+
+// types/projects.tsimport type { Coordinates } from "./map"
+
 export interface Project {
-    id: string;
+    id: number | string;
     name: string;
-    location: {
-        lat: number;
-        lng: number;
-    };
+    coordinates: string;     // Como viene en la API
+    solargis: string;        // Valor de radiación solar
+    agreement: string;       // Tipo de acuerdo
     price: number;
-    radiation: number;
-    distance?: number;
+    // Propiedades calculadas que agregaremos
+    location?: Coordinates;  // Coordenadas parseadas
+    radiation?: number;      // Valor numérico de solargis
+    distance?: number;       // Distancia calculada para búsquedas
 }
 
+export interface ProjectLoader {
+    getProjects(): Promise<Project[]>;
+}
 export interface ProjectStatistics {
     totalProjects: number;
     averagePrice: number;
     averageRadiation: number;
     minDistance: number;
     maxDistance: number;
-}
-
-// types/projects.ts
-export interface ProjectLoader {
-    getProjects(): Promise<Project[]>
 }
 
 export interface ProjectStatisticsCalculator {
