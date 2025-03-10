@@ -1,6 +1,11 @@
 # Mapa Interactivo con Nuxt 3, Vue 3 y Google Maps
 
-![Captura del Mapa](docs/screenshot.png) <!-- Añadir imagen del mapa -->
+![Visualización de heatmap y controles.](/public/images/p1.png) <!-- Añadir imagen del mapa -->
+![Visualización 2.](/public/images//p2.png) <!-- Añadir imagen del mapa -->
+
+![Ubicación de punto para búsqueda de proyecto cercanos y controles de este punto, visualización de proyectos cercanos](/public/images/p3.png) <!-- Añadir imagen del mapa -->
+
+
 
 Aplicación web para visualizar proyectos solares en un mapa interactivo, con heatmaps de precios y radiación, búsqueda por coordenadas, y estadísticas
 
