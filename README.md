@@ -23,6 +23,65 @@ Aplicación web para visualizar proyectos solares en un mapa interactivo, con he
 - **UI:** ShadCN/Radix (Componentes: Card, Slider, Switch)
 - **Herramientas:** TypeScript
 
+## Patrones de Diseño
+### 1. Composables (Hooks)
+Se implementa un sistema de composables como useMap, useHeatmap, useProjects, etc., que encapsulan funcionalidades específicas:
+```bash 
+export { default as useHeatmap } from './useHeatmap';
+export { default as useMap } from './useMap';
+export { default as useProjects } from './useProjects';
+export { default as useSearch } from './useSearch';
+export { default as useStatistics } from './useStatistics';
+```
+Impacto: Este patrón permite compartir lógica entre componentes, reduce la duplicación de código y mejora la mantenibilidad. La lógica relacionada se mantiene junta y puede evolucionar independientemente.
+
+### 2. Observer Pattern
+Se utiliza el sistema reactivo de Vue con ref, computed y watch para implementar el patrón Observer:
+```bash 
+// Ejemplo en InteractiveMap.vue
+watch([searchRadius, searchPoint, projects], () => {
+  if (searchPoint.value) {
+    statistics.value = calculateStatistics(
+      projects.value, 
+      searchPoint.value, 
+      searchRadius.value / 1000
+    );
+  }
+}, { immediate: true });
+
+```
+Impacto: Permite responder automáticamente a cambios en el estado de la aplicación, manteniendo la UI sincronizada con los datos y reduciendo la complejidad del código.
+
+### 3. Adapter Pattern
+Se utiliza para convertir las coordenadas recibidas de la API a un formato utilizable:
+```bash
+ // En parseCoordinates.ts
+export function parseCoordinates(coordStr: string): Coordinates {
+    // Implementación que adapta de string a objeto Coordinates
+}
+
+```
+
+Impacto: Permite adaptar los datos de la API al formato en la aplicación.
+
+
+### 4. Command Pattern
+Implementado en los controles del mapa, donde cada acción del usuario se encapsula en métodos específicos:
+```bash
+// En MapControls.vue
+const handlePriceToggle = () => {
+  priceHeatmapActive.value = !priceHeatmapActive.value;
+  
+  if (priceHeatmapActive.value && radiationHeatmapActive.value) {
+    radiationHeatmapActive.value = false;
+  }
+  
+  emit('toggle-heatmap', 'price');
+};
+
+```
+Impacto: Facilita la implementación de características como activar lo heatmaps para precios o radiacion 
+
 ## Configuración Inicial
 
 ### Requisitos
