@@ -3,7 +3,11 @@
   <div class="min-h-screen bg-background">
     <header class="border-b">
       <div class="container mx-auto py-4 px-6">
-        <h1 class="text-2xl font-bold">Mapa Interactivo de Proyectos</h1>
+        <h1 class="text-2xl font-bold">
+
+        < >
+          
+        </h1>
       </div>
     </header>
     
@@ -18,7 +22,3 @@
     </footer>
   </div>
 </template>
-
-<script setup>
-// Todo el contenido principal se gestiona a través de NuxtPage (pages/index.vue)
-</script>

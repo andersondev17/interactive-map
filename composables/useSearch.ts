@@ -1,4 +1,3 @@
-// composables/useSearch.ts
 import type { Coordinates } from '~/types/map'
 
 export default function useSearch(map: Ref<google.maps.Map | null>) {
@@ -7,39 +6,23 @@ export default function useSearch(map: Ref<google.maps.Map | null>) {
     const searchMarker = ref<google.maps.Marker | null>(null)
     const searchPoint = ref<Coordinates | null>(null)
 
-    // Validar coordenadas numéricas
-    const isValidCoordinate = (value: number, max: number) => 
-        !isNaN(value) && Math.abs(value) <= max
-
     // Manejar búsqueda desde el panel
-    const handleSearch = async (lat: number, lng: number) => {
-        searchPoint.value = { lat, lng };
-        console.log('Punto de búsqueda actualizado:', searchPoint.value); // Depuración
-        if (!map.value || 
-            !isValidCoordinate(lat, 90) || 
-            !isValidCoordinate(lng, 180)) {
+    const handleSearch = (lat: number, lng: number) => {
+        if (!map.value || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
             alert('Coordenadas inválidas')
             return
         }
 
         searchPoint.value = { lat, lng }
-        
-        // Mover mapa a la ubicación
+
         map.value.panTo(searchPoint.value)
         map.value.setZoom(12)
 
-        // Actualizar marcador y círculo
-        updateSearchMarker(searchPoint.value)
-        updateRadius(searchRadius.value)
-    }
+        clearMapElements()
 
-    // Actualizar marcador de búsqueda
-    const updateSearchMarker = (point: Coordinates) => {
-        if (!map.value) return
-
-        searchMarker.value?.setMap(null)
+        // Crear nuevo marcador
         searchMarker.value = new google.maps.Marker({
-            position: point,
+            position: searchPoint.value,
             map: map.value,
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,
@@ -49,29 +32,42 @@ export default function useSearch(map: Ref<google.maps.Map | null>) {
                 strokeWeight: 2
             }
         })
+
+        updateRadius(searchRadius.value)
     }
 
-    // Actualizar radio del círculo
-    const updateRadius = (radius: number) => {
-        searchRadius.value = radius
+    const clearMapElements = () => {
+        if (searchMarker.value) {
+            searchMarker.value.setMap(null)
+            searchMarker.value = null
+        }
         if (searchCircle.value) {
-            searchCircle.value.setRadius(radius)
-        } else if (map.value && searchPoint.value) {
-            searchCircle.value = new google.maps.Circle({
-                map: map.value,
-                center: searchPoint.value,
-                radius,
-                strokeColor: '#4285F4',
-                fillColor: '#4285F4',
-                fillOpacity: 0.1
-            })
+            searchCircle.value.setMap(null)
+            searchCircle.value = null
         }
     }
 
-    return { 
-        searchRadius, 
-        searchPoint,
-        handleSearch, 
-        updateRadius 
+    const updateRadius = (radius: number) => {
+        searchRadius.value = radius
+
+        if (!map.value || !searchPoint.value) return
+
+        // Eliminar círculo anterior antes de crear uno nuevo
+        if (searchCircle.value) {
+            searchCircle.value.setMap(null)
+        }
+
+        searchCircle.value = new google.maps.Circle({
+            map: map.value,
+            center: searchPoint.value,
+            radius,
+            strokeColor: '#4285F4',
+            strokeOpacity: 0.6,
+            strokeWeight: 2,
+            fillColor: '#4285F4',
+            fillOpacity: 0.1
+        })
     }
+
+    return { searchRadius, searchPoint, handleSearch, updateRadius }
 }

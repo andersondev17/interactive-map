@@ -68,3 +68,32 @@
         @apply bg-background text-foreground;
     }
 }
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.panel-enter-active,
+.panel-leave-active {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.panel-enter-from,
+.panel-leave-to {
+    opacity: 0;
+    transform: translateY(100%);
+}
+
+@media (min-width: 768px) {
+
+    .panel-enter-from,
+    .panel-leave-to {
+        transform: translateX(100%);
+    }
+}

@@ -23,3 +23,12 @@ export interface MapProvider {
 export interface HeatmapProvider {
     createLayer(data: HeatmapData[]): void
 }
+
+export type HeatmapType = 'price' | 'radiation' | null;
+export type HeatmapConfig = {
+    radius: number;
+    opacity: number;
+    dissipating: boolean;
+    maxIntensity?: number;
+    gradient: string[];
+};

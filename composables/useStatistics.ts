@@ -1,67 +1,31 @@
 // composables/useStatistics.ts
 import type { Coordinates } from '~/types/map';
-import type { Project } from '~/types/projects';
+import type { Project, StatisticsResult } from '~/types/projects';
+import { calculateHaversineDistance } from '~/utils/geo';
 
 export default function useStatistics() {
-    // Calcular distancia entre dos puntos usando la fórmula de Haversine
-    const calculateDistance = (point1: Coordinates, point2: Coordinates | undefined): number => {
-        if (!point1 || !point2) return Infinity;
-        
-        const R = 6371; // Radio de la Tierra en km
-        const dLat = toRadians(point2.lat - point1.lat);
-        const dLng = toRadians(point2.lng - point1.lng);
-
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRadians(point1.lat)) * Math.cos(toRadians(point2.lat)) *
-            Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distancia en km
-    };
-
-    // Convertir grados a radianes
-    const toRadians = (degrees: number): number => {
-        return degrees * (Math.PI / 180);
-    };
-
-    // Filtrar proyectos dentro de un radio específico
-    const filterProjectsByRadius = (
-        projects: Project[],
-        center: Coordinates,
-        radiusKm: number
-    ): Project[] => {
-        return projects.filter(project => {
-            if (!project.location) return false;
-            
-            const distance = calculateDistance(center, project.location);
-            project.distance = distance;
-            return distance <= radiusKm;
-        });
-    };
-
-    // Calcular estadísticas sobre proyectos
     const calculateStatistics = (
         projects: Project[],
         center: Coordinates | null,
         radiusKm: number
     ): StatisticsResult | null => {
-        if (!center || !projects.length) {
-            return null;
-        }
+        if (!center || !projects.length) return null;
 
-        // Filtrar proyectos dentro del radio
-        const filteredProjects = filterProjectsByRadius(projects, center, radiusKm);
+        const filteredProjects = projects
+            .filter(project => {
+                if (!project.location) return false;
+                
+                project.distance = calculateHaversineDistance(center, project.location);
+                return project.distance <= radiusKm;
+            });
 
-        if (!filteredProjects.length) {
-            return null;
-        }
+        if (!filteredProjects.length) return null;
 
-        // Calcular estadísticas
-        const count = filteredProjects.length;
+        // Extraer valores para cálculos
         const prices = filteredProjects.map(p => p.price);
         const radiations = filteredProjects.map(p => p.radiation || 0);
         const distances = filteredProjects.map(p => p.distance || 0);
+        const count = filteredProjects.length;
 
         return {
             count,
@@ -75,21 +39,5 @@ export default function useStatistics() {
         };
     };
 
-    return {
-        calculateDistance,
-        filterProjectsByRadius,
-        calculateStatistics
-    };
-}
-
-// Tipo para las estadísticas calculadas
-export interface StatisticsResult {
-    count: number;
-    averagePrice: number;
-    minPrice: number;
-    maxPrice: number;
-    averageRadiation: number;
-    minRadiation: number;
-    maxRadiation: number;
-    minDistance: number;
+    return { calculateStatistics };
 }

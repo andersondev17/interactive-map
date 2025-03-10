@@ -1,12 +1,17 @@
 <!-- pages/index.vue -->
 <template>
     <div class="container mx-auto py-6 space-y-6">
-        <div class="flex flex-col gap-2">
-            <h1 class="text-3xl font-bold tracking-tight">Mapa Interactivo de Proyectos</h1>
-            <p class="text-muted-foreground">
-                Explora proyectos en el mapa, visualiza datos de precios y radiación solar, y analiza estadísticas.
+        <div class="space-y-4">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent animate-fade-in">
+                Mapa Interactivo de Proyectos</h1>
+                <p class="text-xl text-muted-foreground leading-relaxed max-w-2xl">
+                    Explora proyectos en el mapa, visualiza datos de precios y radiación solar, y analiza estadísticas.
             </p>
+
+            
         </div>
+        
+        
 
         <Tabs default-value="map" class="w-full">
             <TabsList>

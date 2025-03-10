@@ -15,6 +15,17 @@ export interface Project {
     distance?: number;       // Distancia calculada para búsquedas
 }
 
+export interface StatisticsResult {
+    count: number;
+    averagePrice: number;
+    minPrice: number;
+    maxPrice: number;
+    averageRadiation: number;
+    minRadiation: number;
+    maxRadiation: number;
+    minDistance: number;
+}
+
 export interface ProjectLoader {
     getProjects(): Promise<Project[]>;
 }

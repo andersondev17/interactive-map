@@ -1,78 +1,57 @@
 <!-- components/map/NearbyProjects.vue -->
 <script setup lang="ts">
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Formatter } from '@/utils/formatter';
+import { calculateHaversineDistance } from '@/utils/geo';
 import { MapPin } from 'lucide-vue-next';
 import type { Coordinates } from '~/types/map';
 import type { Project } from '~/types/projects';
 
-interface Props {
+const props = defineProps<{
     projects: Project[];
     searchPoint: Coordinates | null;
     radiusKm: number;
-}
+}>();
 
-const props = defineProps<Props>();
+// Formateadores reutilizables
+const { currency, number: formatNumber } = Formatter();
 
-// Filtrar proyectos por radio
 const nearbyProjects = computed(() => {
     if (!props.searchPoint) return [];
     
     return props.projects
-        .filter(project => {
-            const distance = calculateDistance(props.searchPoint!, project.location);
-            return distance <= props.radiusKm; // Radio en km
-        })
-        .sort((a, b) => calculateDistance(props.searchPoint!, a.location) - calculateDistance(props.searchPoint!, b.location))
+        .filter(project => project.location) // Filtrar proyectos sin ubicación
+        .map(project => ({
+            ...project,
+            distance: calculateHaversineDistance(props.searchPoint!, project.location!)
+        }))
+        .filter(({ distance }) => distance <= props.radiusKm)
+        .sort((a, b) => a.distance - b.distance)
         .slice(0, 10);
 });
 
-// Calcular distancia entre dos puntos usando la fórmula de Haversine
-function calculateDistance(point1: Coordinates, point2: Coordinates): number {
-    const R = 6371; // Radio de la Tierra en km
-    const dLat = toRadians(point2.lat - point1.lat);
-    const dLng = toRadians(point2.lng - point1.lng);
-
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRadians(point1.lat)) * Math.cos(toRadians(point2.lat)) *
-        Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distancia en km
-}
-
-function toRadians(degrees: number): number {
-    return degrees * (Math.PI / 180);
-}
-
-// Calcular estadísticas
+// Estadísticas con cálculo seguro
 const stats = computed(() => {
-    if (!nearbyProjects.value.length) return null;
+    const count = nearbyProjects.value.length;
+    if (!count) return null;
 
-    const prices = nearbyProjects.value.map(p => p.price);
-    const radiations = nearbyProjects.value.map(p => p.radiation);
+    const total = nearbyProjects.value.reduce((acc, { distance, price, radiation }) => ({
+        distance: acc.distance + (distance || 0),
+        price: acc.price + price,
+        radiation: acc.radiation + (radiation || 0)
+    }), { distance: 0, price: 0, radiation: 0 });
 
     return {
-        count: nearbyProjects.value.length,
-        avgDistance: nearbyProjects.value.reduce((sum, p) => sum + (p.distance || 0), 0) / nearbyProjects.value.length,
-        avgPrice: prices.reduce((sum, p) => sum + p, 0) / prices.length,
-        avgRadiation: radiations.reduce((sum, r) => sum + r, 0) / radiations.length
+        count,
+        avgDistance: total.distance / count,
+        avgPrice: total.price / count,
+        avgRadiation: total.radiation / count
     };
 });
-
-// Formatear números
-const formatNumber = (value: number, decimals = 2): string => {
-    return value.toFixed(decimals);
-};
-
-// Formatear precios
-const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('es-CO').format(value);
-};
 </script>
 
 <template>
-    <Card class="absolute bottom-24 left-4 z-10 w-80 max-h-[300px]" v-if="nearbyProjects.length > 0">
+    <Card v-show="nearbyProjects.length" class="absolute bottom-24 left-4 z-10 w-80 max-h-[300px]">
         <CardHeader class="pb-2">
             <CardTitle class="text-sm font-medium flex items-center justify-between">
                 <span>Proyectos cercanos ({{ nearbyProjects.length }})</span>
@@ -83,7 +62,6 @@ const formatCurrency = (value: number): string => {
         </CardHeader>
         <CardContent class="p-0 overflow-y-auto max-h-[240px]">
             <div class="border-t divide-y">
-                <!-- Estadísticas resumen -->
                 <div v-if="stats" class="p-3 bg-muted/40">
                     <div class="grid grid-cols-3 gap-2 text-xs">
                         <div>
@@ -92,7 +70,7 @@ const formatCurrency = (value: number): string => {
                         </div>
                         <div>
                             <div class="text-muted-foreground">Precio promedio</div>
-                            <div class="font-medium">{{ formatCurrency(stats.avgPrice) }}</div>
+                            <div class="font-medium">{{ currency(stats.avgPrice) }}</div>
                         </div>
                         <div>
                             <div class="text-muted-foreground">Radiación</div>
@@ -101,16 +79,15 @@ const formatCurrency = (value: number): string => {
                     </div>
                 </div>
 
-                <!-- Lista de proyectos -->
                 <div v-for="project in nearbyProjects" :key="project.id" class="p-3 hover:bg-muted/20">
                     <div class="font-medium text-sm">{{ project.name }}</div>
                     <div class="mt-1 grid grid-cols-2 gap-1 text-xs">
                         <div class="flex items-center gap-1 text-muted-foreground">
                             <MapPin class="h-3 w-3" />
-                            <span>{{ formatNumber(project.distance || 0) }} km</span>
+                            <span>{{ formatNumber(project.distance) }} km</span>
                         </div>
                         <div class="text-right text-muted-foreground">
-                            {{ formatCurrency(project.price) }} COP
+                            {{ currency(project.price) }}
                         </div>
                     </div>
                 </div>
