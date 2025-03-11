@@ -25,7 +25,7 @@ Aplicación web para visualizar proyectos solares en un mapa interactivo, con he
 
 ## Patrones de Diseño
 ### 1. Composables (Hooks)
-Se implementa un sistema de composables como useMap, useHeatmap, useProjects, etc., que encapsulan funcionalidades específicas:
+Se implementa un sistema de composables como useMap, useHeatmap, useProjects, etc., permite que cada parte del sistema tenga una responsabilidad única
 ```bash 
 export { default as useHeatmap } from './useHeatmap';
 export { default as useMap } from './useMap';

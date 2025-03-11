@@ -7,16 +7,16 @@ export default function useMap(container: Ref<HTMLElement | null>) {
     const isLoading = ref(false)
     const { width } = useWindowSize()
     const isDesktop = computed(() => width.value >= 768)
-
+    
+    const loader = new Loader({
+        apiKey: useRuntimeConfig().public.googleMapsApiKey,
+        libraries: ['visualization']
+    })
     async function initMap(center: Coordinates) {
         if (!container.value) return
 
         try {
             isLoading.value = true
-            const loader = new Loader({
-                apiKey: useRuntimeConfig().public.googleMapsApiKey,
-                libraries: ['visualization']
-            })
 
             const { Map } = await loader.importLibrary('maps')
             map.value = new Map(container.value, {
